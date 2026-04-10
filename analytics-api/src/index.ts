@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import pool from './db';
 import { overviewRoutes } from './routes/overview';
 import { growthRoutes } from './routes/growth';
 import { transactionsRoutes } from './routes/transactions';
@@ -19,7 +20,7 @@ app.addHook('onRequest', async (request, reply) => {
   if (request.url === '/health') return;
   const apiKey = request.headers['x-api-key'];
   if (apiKey !== process.env.API_KEY) {
-    reply.code(401).send({ error: 'Unauthorized' });
+    return reply.code(401).send({ error: 'Unauthorized' });
   }
 });
 
@@ -37,6 +38,16 @@ const start = async () => {
   const port = parseInt(process.env.PORT || '4000');
   await app.listen({ port, host: '0.0.0.0' });
   console.log(`Analytics API listening on port ${port}`);
+
+  const shutdown = async () => {
+    console.log('Shutting down...');
+    await app.close();
+    await pool.end();
+    process.exit(0);
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 };
 
 start();

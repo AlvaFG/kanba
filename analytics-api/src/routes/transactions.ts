@@ -14,12 +14,13 @@ function dateTrunc(period: string): string {
   return 'month';
 }
 
-function buildFilters(q: QueryParams, dateCol = 'created_at'): { conditions: string[]; params: unknown[] } {
+function buildFilters(q: QueryParams, dateCol = 'created_at', prefix = ''): { conditions: string[]; params: unknown[] } {
+  const p = prefix ? `${prefix}.` : '';
   const conditions: string[] = [];
   const params: unknown[] = [];
-  if (q.from) { params.push(q.from); conditions.push(`${dateCol} >= $${params.length}`); }
-  if (q.to) { params.push(q.to); conditions.push(`${dateCol} <= $${params.length}`); }
-  if (q.restaurant_id) { params.push(q.restaurant_id); conditions.push(`restaurant_id = $${params.length}`); }
+  if (q.from) { params.push(q.from); conditions.push(`${p}${dateCol} >= $${params.length}`); }
+  if (q.to) { params.push(q.to); conditions.push(`${p}${dateCol} <= $${params.length}`); }
+  if (q.restaurant_id) { params.push(q.restaurant_id); conditions.push(`${p}restaurant_id = $${params.length}`); }
   return { conditions, params };
 }
 
@@ -43,13 +44,18 @@ export async function transactionsRoutes(app: FastifyInstance) {
       params
     );
 
+    const { conditions: itemConditions, params: itemParams } = buildFilters(q, 'created_at', 'o');
+    itemConditions.push("o.status != 'cancelled'");
+    const itemWhere = `WHERE ${itemConditions.join(' AND ')}`;
+
     const topItems = await query<{ name: string; quantity: string; revenue: string }>(
       `SELECT mi.name, SUM(oi.quantity) AS quantity, SUM(oi.subtotal) AS revenue
       FROM order_items oi
       JOIN menu_items mi ON oi.menu_item_id = mi.id
       JOIN orders o ON oi.order_id = o.id
-      WHERE o.status != 'cancelled'
-      GROUP BY mi.name ORDER BY quantity DESC LIMIT 10`
+      ${itemWhere}
+      GROUP BY mi.name ORDER BY quantity DESC LIMIT 10`,
+      itemParams
     );
 
     const data = {
@@ -67,8 +73,8 @@ export async function transactionsRoutes(app: FastifyInstance) {
     const cached = cache.get(key);
     if (cached) return cached;
 
-    const { conditions, params } = buildFilters(q);
-    conditions.push("status != 'cancelled'");
+    const { conditions, params } = buildFilters(q, 'created_at', 'o');
+    conditions.push("o.status != 'cancelled'");
     const where = `WHERE ${conditions.join(' AND ')}`;
 
     const byRestaurant = await query<{ restaurant_id: string; name: string; revenue: string; order_count: string }>(
@@ -79,9 +85,9 @@ export async function transactionsRoutes(app: FastifyInstance) {
     );
 
     const byPaymentMethod = await query<{ method: string; count: string; total: string }>(
-      `SELECT payment_method AS method, COUNT(*) AS count, SUM(total) AS total
-      FROM orders ${where} AND payment_method IS NOT NULL
-      GROUP BY payment_method ORDER BY total DESC`,
+      `SELECT o.payment_method AS method, COUNT(*) AS count, SUM(o.total) AS total
+      FROM orders o ${where} AND o.payment_method IS NOT NULL
+      GROUP BY o.payment_method ORDER BY total DESC`,
       params
     );
 
