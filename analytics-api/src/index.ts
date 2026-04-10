@@ -6,6 +6,9 @@ import { growthRoutes } from './routes/growth';
 import { transactionsRoutes } from './routes/transactions';
 import { activityRoutes } from './routes/activity';
 import { refreshRoutes } from './routes/refresh';
+import { usersRoutes } from './routes/users';
+import { restaurantsRoutes } from './routes/restaurants';
+import { exportRoutes } from './routes/export';
 
 const app = Fastify({ logger: true });
 
@@ -33,6 +36,9 @@ app.register(growthRoutes, { prefix: '/growth' });
 app.register(transactionsRoutes, { prefix: '/transactions' });
 app.register(activityRoutes, { prefix: '/activity' });
 app.register(refreshRoutes, { prefix: '/refresh' });
+app.register(usersRoutes, { prefix: '/users' });
+app.register(restaurantsRoutes, { prefix: '/restaurants' });
+app.register(exportRoutes, { prefix: '/export' });
 
 const start = async () => {
   const port = parseInt(process.env.PORT || '4000');
