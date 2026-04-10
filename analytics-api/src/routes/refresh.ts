@@ -1,5 +1,9 @@
 import { FastifyInstance } from 'fastify';
+import * as cache from '../cache';
 
 export async function refreshRoutes(app: FastifyInstance) {
-  // Routes will be added in a later task
+  app.post('/', async () => {
+    cache.clear();
+    return { status: 'ok', message: 'Cache cleared' };
+  });
 }
