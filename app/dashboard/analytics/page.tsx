@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { RefreshCw, Users, Store, ShoppingCart, DollarSign, AlertCircle } from 'lucide-react';
-import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -45,14 +44,6 @@ function KpiSkeleton() {
     </Card>
   );
 }
-
-// Simple sparkline-style mock data for the mini chart
-const sparklineData = [
-  { d: '1', v: 12 }, { d: '2', v: 18 }, { d: '3', v: 15 },
-  { d: '4', v: 22 }, { d: '5', v: 28 }, { d: '6', v: 25 },
-  { d: '7', v: 30 }, { d: '8', v: 35 }, { d: '9', v: 32 },
-  { d: '10', v: 38 }, { d: '11', v: 42 }, { d: '12', v: 40 },
-];
 
 export default function AnalyticsOverviewPage() {
   const { fetchData, refresh, loading, error } = useAnalytics();
@@ -174,46 +165,6 @@ export default function AnalyticsOverviewPage() {
         ) : null}
       </div>
 
-      {/* Orders Over Time Mini Chart */}
-      {data && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Orders Trend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={sparklineData}>
-                  <defs>
-                    <linearGradient id="orderGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="d" hide />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                    }}
-                    labelFormatter={(label) => `Day ${label}`}
-                    formatter={(value: number) => [value, 'Orders']}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="v"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                    fill="url(#orderGradient)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

@@ -1,8 +1,5 @@
 import { useState, useCallback } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_ANALYTICS_API_URL || '';
-const API_KEY = process.env.NEXT_PUBLIC_ANALYTICS_API_KEY || '';
-
 export function useAnalytics() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -11,13 +8,11 @@ export function useAnalytics() {
     setLoading(true);
     setError(null);
     try {
-      const url = new URL(endpoint, API_URL);
+      const url = new URL(`/api/analytics${endpoint}`, window.location.origin);
       if (params) {
         Object.entries(params).forEach(([k, v]) => { if (v) url.searchParams.set(k, v); });
       }
-      const res = await fetch(url.toString(), {
-        headers: { 'x-api-key': API_KEY },
-      });
+      const res = await fetch(url.toString());
       if (!res.ok) throw new Error(`API error: ${res.status}`);
       return await res.json() as T;
     } catch (e) {
@@ -29,10 +24,7 @@ export function useAnalytics() {
   }, []);
 
   const refresh = useCallback(async () => {
-    await fetch(`${API_URL}/refresh`, {
-      method: 'POST',
-      headers: { 'x-api-key': API_KEY },
-    });
+    await fetch('/api/analytics/refresh', { method: 'POST' });
   }, []);
 
   return { fetchData, refresh, loading, error };
