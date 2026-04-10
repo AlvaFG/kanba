@@ -93,7 +93,7 @@ const menuItems = [
   { title: "Projects", url: "/dashboard/projects", icon: FolderIcon },
   { title: "Bookmarks", url: "/dashboard/bookmarks", icon: Bookmark },
   { title: "Notes (soon)", url: "/dashboard/notes", icon: NotepadTextIcon, disabled: true },
-  { title: "Analytics (soon)", url: "/dashboard/analytics", icon: BarChartIcon, disabled: true },
+  { title: "Analytics", url: "/dashboard/analytics", icon: BarChartIcon },
   { title: "Integrations (soon)", url: "/dashboard/integrations", icon: PlugZap, disabled: true },
   { title: "Lists (soon)", url: "/dashboard/listd", icon: List, disabled: true },
   { title: "AI Planner (soon)", url: "/dashboard/integrations", icon: Brain, disabled: true },
