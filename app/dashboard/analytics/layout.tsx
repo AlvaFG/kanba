@@ -7,6 +7,8 @@ const tabs = [
   { label: 'Growth', href: '/dashboard/analytics/growth' },
   { label: 'Transactions', href: '/dashboard/analytics/transactions' },
   { label: 'Activity', href: '/dashboard/analytics/activity' },
+  { label: 'Users', href: '/dashboard/analytics/users' },
+  { label: 'Restaurants', href: '/dashboard/analytics/restaurants' },
 ];
 
 export default function AnalyticsLayout({ children }: { children: React.ReactNode }) {
@@ -17,7 +19,7 @@ export default function AnalyticsLayout({ children }: { children: React.ReactNod
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
-        <p className="text-muted-foreground">Aramal platform metrics and insights</p>
+        <p className="text-sm text-muted-foreground">Aramal platform metrics and insights</p>
       </div>
 
       <div className="flex gap-1 border-b">
